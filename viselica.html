@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        class Hangman {
+            constructor(words) {
+                this.words = words;
+                this.template = '';
+                this.subm = null;
+                this.randomWord;
+                this.countOfLife = 5;
+
+            }
+            makePage(word) {
+                let body = document.querySelector('body');
+
+                body.style.textAlign = 'center'
+
+                let title = document.createElement('div');
+                title.textContent = 'Hangman game';
+                title.style.fontSize = 100 + 'px';
+                title.style.backgroundColor = 'lightblue';
+                title.style.color = 'white'
+                body.append(title);
+
+                let container = document.createElement('div')
+                container.classList = 'game';
+                let gameText = document.createElement('div');
+                gameText.classList = 'gameText';
+                gameText.textContent = `Вы загадали слово из ${word.length} букв`
+                container.append(gameText);
+
+                let inp = document.createElement('input')
+                inp.type = 'text'
+                inp.style.fontSize = 30 + 'px';
+                container.append(inp);
+                this.subm = document.createElement('input')
+                this.subm.type = 'submit'
+                this.subm.value = 'Enter'
+                this.subm.style.fontSize = 30 + 'px'
+                container.append(this.subm);
+
+                let temp = document.createElement('div');
+                temp.classList = 'template'
+                temp.textContent = this.template
+                console.log(this.template);
+                temp.style.fontSize = 40 + 'px'
+                container.append(temp)
+
+                body.append(container)
+
+                let lifes = document.createElement('div');
+                lifes.classList = 'lifes';
+                lifes.textContent = this.countOfLife;
+                lifes.style.fontSize = 30 + 'px';
+                lifes.style.color = 'red'
+
+                body.append(lifes)
+
+            }
+            getRandomWord() {
+                return this.words[Math.floor(Math.random() * this.words.length)]
+            }
+
+            generateTemplate(word) {
+                for (let i = 0; i < word.length; i++) {
+                    this.template += "_ "
+                }
+
+            }
+            findInput() {
+                let input = document.querySelector('input[type="text"]');
+                return input.value;
+            }
+
+            checkLetter(letter) {
+                let array = this.template.split(' ')
+                for (let i = 0; i < this.randomWord.length; i++) {
+                    if (this.randomWord[i] == letter) {
+                        array[i] = letter;
+                    }
+                }
+                // console.log(array.join(' '));
+                return array.join(' ');
+
+            }
+            updateTemplate() {
+                let updTemp = document.querySelector('.template');
+                updTemp.textContent = this.template;
+                let resetInput = document.querySelector('input[type="text"]');
+                resetInput.value = '';
+
+            }
+
+            findLetter(letter) {
+                for (let i = 0; i < this.randomWord.length; i++) {
+                    if (this.randomWord[i] == letter) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+
+            checkGameOver() {
+                for (let i = 0; i < this.template.length; i++) {
+                    if (this.template[i] == '_') {
+                        return false;
+                    }
+                }
+                return true;
+
+            }
+            gameOver(arg) {
+                let body = document.querySelector('body');
+                let gameOver = document.createElement('div');
+                if (arg == 'win') {
+                    gameOver.textContent = 'УРА';
+                } else {
+                    gameOver.textContent = 'ПРОИГРАЛ';
+                }
+
+                gameOver.style.fontSize = 100 + 'px';
+                gameOver.style.backgroundColor = 'lightblue';
+                gameOver.style.color = 'white'
+                body.append(gameOver);
+                this.subm.removeEventListener('click', this.clickEvent);
+            }
+
+            countOfLifes() {
+                let count = document.querySelector('.lifes');
+                this.countOfLife--;
+                count.textContent = this.countOfLife;
+            }
+
+            clickEvent(event) {
+                console.log(this.context);
+                let currentInput = this.context.findInput();
+                this.context.template = this.context.checkLetter(currentInput);
+                console.log(this.context.template);
+                this.context.updateTemplate();
+                if (this.context.checkGameOver()) {
+                    this.context.gameOver('win');
+                }
+                if (!this.context.findLetter(currentInput)) {
+                    this.context.countOfLifes()
+                    if (this.context.countOfLife == 0) {
+                        this.context.gameOver('loose')
+                    }
+                }
+
+
+            }
+
+            run() {
+
+                this.randomWord = this.getRandomWord()
+                console.log(this.randomWord);
+                this.generateTemplate(this.randomWord);
+                this.makePage(this.randomWord);
+                this.subm.context = this;
+                this.subm.addEventListener('click', this.clickEvent);
+
+            }
+
+
+
+        }
+        let abc = new Hangman(['apple', 'cat', 'catapulta']);
+        abc.run()
+
+    </script>
+
+</body>
+
+</html>
